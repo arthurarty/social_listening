@@ -8,4 +8,3 @@ Using OCR and a multimodal LLM to process the image of a news paper page.
 - Twitter - https://sorsa.io/ - Starting at $50 a month
 
 - All platforms - https://www.netrows.com/ - starting at $30 a month
-# social_listening

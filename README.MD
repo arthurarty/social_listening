@@ -21,6 +21,14 @@ Create a `.env` file in the project root with the required API keys:
 TWEETAPIIO=<your-key>
 ```
 
+## Pre-commit hooks
+This repo uses [pre-commit](https://pre-commit.com/) to run `black`, `isort`, and `autoflake` before each commit.
+
+`pre-commit` is installed via `requirements.txt`, so after activating your venv, install the git hooks:
+```bash
+pre-commit install
+```
+
 ## Run
 ```bash
 source venv/bin/activate

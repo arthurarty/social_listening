@@ -1,7 +1,5 @@
 from ollama import chat
 
-
-
 SYSTEM_PROMPT = """
 You are an expert at transcribing newspaper pages into clean markdown.
 
@@ -29,26 +27,26 @@ def write_md_file(image_path: str, txt_file: str, output_file: str):
     # or the raw bytes
     # img = Path(path).read_bytes()
 
-    with open(txt_file, 'r') as f:
+    with open(txt_file, "r") as f:
         txt_content = f.read()
 
     response = chat(
-        model='gemma4',
+        model="gemma4",
         messages=[
             {
-                'role': 'system',
-                'content': SYSTEM_PROMPT,
+                "role": "system",
+                "content": SYSTEM_PROMPT,
             },
             {
-                'role': 'user',
-                'content': txt_content,
-                'images': [image_path],
+                "role": "user",
+                "content": txt_content,
+                "images": [image_path],
             },
         ],
     )
 
-    with open(output_file, 'w') as f:
-        f.write(response.message.content or '')
+    with open(output_file, "w") as f:
+        f.write(response.message.content or "")
 
 
 write_md_file("pdf_scan.png", "pdf_scan.txt", "pfd_scan.MD")

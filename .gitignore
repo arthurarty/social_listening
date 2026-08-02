@@ -1,3 +1,7 @@
+# Local files
 .DS_Store
 .env
 /local_files
+
+# Python specific
+__pycache__

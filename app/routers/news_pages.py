@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, UploadFile, status
 
 
 router = APIRouter(
@@ -7,11 +7,14 @@ router = APIRouter(
 )
 
 
-@router.post("/")
-async def uploads_news_page():
+@router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED
+)
+async def uploads_news_page(file: UploadFile):
     """
     Uploads an image of a news paper page
     """
     return {
-        "message": "Page scan uploaded"
+        "message": f"Page: {file.filename} scan uploaded"
     }

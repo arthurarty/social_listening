@@ -55,8 +55,6 @@ Review the generated file in `app/database/alembic/versions/`, then apply it wit
 alembic upgrade head
 ```
 
-> Note: Alembic's autogenerate sometimes emits `sqlmodel.sql.sqltypes.AutoString()` for string columns without adding `import sqlmodel` to the generated file. If `alembic upgrade head` fails with `NameError: name 'sqlmodel' is not defined`, add `import sqlmodel` to the migration file's imports.
-
 ## Pre-commit hooks
 This repo uses [pre-commit](https://pre-commit.com/) to run `black`, `isort`, and `autoflake` before each commit.
 

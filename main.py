@@ -1,5 +1,5 @@
-from PIL import Image
 import pytesseract
+from PIL import Image
 
 
 def main(image_path: str, output_file_name: str):

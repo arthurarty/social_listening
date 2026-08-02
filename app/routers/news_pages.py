@@ -1,8 +1,8 @@
-from fastapi import APIRouter, UploadFile, status, HTTPException
-import aiofiles
 import uuid
 from pathlib import Path
 
+import aiofiles
+from fastapi import APIRouter, HTTPException, UploadFile, status
 
 UPLOAD_DIR = Path("local_files/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -10,25 +10,16 @@ ALLOWED_TYPES = {"image/jpeg", "image/png"}
 MAX_SIZE = 10 * 1024 * 1024  # 10MB
 
 
-router = APIRouter(
-    prefix="/news-pages",
-    tags=["news_pages"]
-)
+router = APIRouter(prefix="/news-pages", tags=["news_pages"])
 
 
-@router.post(
-    "/",
-    status_code=status.HTTP_201_CREATED
-)
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def uploads_news_page(file: UploadFile):
     """
     Uploads an image of a news paper page
     """
     if file.content_type not in ALLOWED_TYPES:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            "Unsupported file type"
-        )
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unsupported file type")
     if (not file.size) or file.size > MAX_SIZE:
         raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "File too large")
     if not file.filename:
@@ -43,6 +34,4 @@ async def uploads_news_page(file: UploadFile):
             if not chunk:
                 break
             await out_file.write(chunk)
-    return {
-        "message": f"Page: {file.filename} scan uploaded"
-    }
+    return {"message": f"Page: {file.filename} scan uploaded"}

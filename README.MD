@@ -54,6 +54,10 @@ Review the generated file in `app/database/alembic/versions/`, then apply it wit
 ```bash
 alembic upgrade head
 ```
+To roll back a migration you can use the command:
+```bash
+alembic downgrade -1
+```
 
 ## Pre-commit hooks
 This repo uses [pre-commit](https://pre-commit.com/) to run `black`, `isort`, and `autoflake` before each commit.

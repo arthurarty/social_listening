@@ -1,8 +1,10 @@
 import uuid
+from datetime import datetime
 from pathlib import Path
+from typing import Annotated
 
 import aiofiles
-from fastapi import APIRouter, HTTPException, UploadFile, status
+from fastapi import APIRouter, Form, HTTPException, UploadFile, status
 
 UPLOAD_DIR = Path("local_files/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -14,10 +16,18 @@ router = APIRouter(prefix="/news-pages", tags=["news_pages"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def uploads_news_page(file: UploadFile):
+async def uploads_news_page(
+    news_paper_name: Annotated[str, Form()],
+    page_number: Annotated[int, Form()],
+    date_published: Annotated[datetime, Form()],
+    file: UploadFile,
+):
     """
     Uploads an image of a news paper page
     """
+    assert news_paper_name
+    assert page_number
+    assert date_published
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unsupported file type")
     if (not file.size) or file.size > MAX_SIZE:

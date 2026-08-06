@@ -19,7 +19,7 @@ pip install -r requirements.txt
 
 Create a `.env` file in the project root with the required API keys:
 ```
-TWEETAPIIO=<your-key>
+TWEET_API_IO=<your-key>
 DATABASE_URL="postgresql://social_listening:socialListeningPassword@localhost:5432/social_listening"
 ```
 

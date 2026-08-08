@@ -6,7 +6,7 @@ import aiofiles
 
 from app.config import settings
 from app.database.connection import db_session
-from app.database.news_page import NewsPage
+from app.database.models.news_page import NewsPage
 from app.schemas.news_page_schemas import NewsPageCreationRequest
 
 UPLOAD_DIR = Path(settings.file_upload_dir)

@@ -10,7 +10,7 @@ sys.path.insert(0, os.getcwd())
 from sqlmodel import SQLModel
 
 from app.config import settings
-from app.database import (  # noqa: F401  (registers models on SQLModel.metadata)
+from app.database.models import (  # noqa: F401  (registers models on SQLModel.metadata)
     news_page,
 )
 

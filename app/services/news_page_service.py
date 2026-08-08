@@ -1,13 +1,15 @@
 import uuid
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import List
 
 import aiofiles
+from sqlmodel import select
 
 from app.config import settings
 from app.database.connection import db_session
-from app.database.news_page import NewsPage
-from app.schemas.news_page_schemas import NewsPageCreationRequest
+from app.database.models.news_page import NewsPage
+from app.schemas.news_page_schemas import NewsPageCreationRequest, NewsPageRead
 
 UPLOAD_DIR = Path(settings.file_upload_dir)
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -22,6 +24,14 @@ class NewsPageServiceInterface(ABC):
     async def create_news_page(self, creation_request: NewsPageCreationRequest) -> str:
         """
         Creates a news page
+        """
+
+    @abstractmethod
+    def get_news_pages(
+        self, processed: bool = False, skip: int = 0, limit: int = 10
+    ) -> List[NewsPageRead]:
+        """
+        Get news pages
         """
 
 
@@ -60,3 +70,17 @@ class NewsPageServiceImpl(NewsPageServiceInterface):
         with db_session() as session:
             session.add(news_page)
         return "Done"
+
+    def get_news_pages(
+        self, processed: bool = False, skip: int = 0, limit: int = 10
+    ) -> List[NewsPageRead]:
+        with db_session() as session:
+            query = (
+                select(NewsPage)
+                .where(NewsPage.processed == processed)
+                .limit(limit)
+                .order_by(NewsPage.id)
+                .offset(skip)
+            )
+            news_pages = session.execute(query).scalars().all()
+            return [NewsPageRead.model_validate(news_page) for news_page in news_pages]

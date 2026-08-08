@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, List
 
-from fastapi import APIRouter, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Form, HTTPException, Query, UploadFile, status
 
 from app.dependencies import NewsPageServiceDep
-from app.schemas.news_page_schemas import NewsPageCreationRequest
+from app.schemas.news_page_schemas import NewsPageCreationRequest, NewsPageRead
 
 ALLOWED_TYPES = {"image/jpeg", "image/png"}
 MAX_SIZE = 10 * 1024 * 1024  # 10MB
@@ -40,3 +40,16 @@ async def uploads_news_page(
         )
     )
     return {"message": f"{output}"}
+
+
+@router.get("/", response_model=List[NewsPageRead])
+def list_news_pages(
+    news_page_service: NewsPageServiceDep,
+    processed: bool = False,
+    skip: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+):
+    """
+    Lists news pages, optionally filtered by processed status
+    """
+    return news_page_service.get_news_pages(processed=processed, skip=skip, limit=limit)

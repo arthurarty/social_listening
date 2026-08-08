@@ -9,7 +9,7 @@ from sqlmodel import select
 from app.config import settings
 from app.database.connection import db_session
 from app.database.models.news_page import NewsPage
-from app.schemas.news_page_schemas import NewsPageCreationRequest
+from app.schemas.news_page_schemas import NewsPageCreationRequest, NewsPageRead
 
 UPLOAD_DIR = Path(settings.file_upload_dir)
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -29,7 +29,7 @@ class NewsPageServiceInterface(ABC):
     @abstractmethod
     def get_news_pages(
         self, processed: bool = False, skip: int = 0, limit: int = 10
-    ) -> List[NewsPage]:
+    ) -> List[NewsPageRead]:
         """
         Get news pages
         """
@@ -73,7 +73,7 @@ class NewsPageServiceImpl(NewsPageServiceInterface):
 
     def get_news_pages(
         self, processed: bool = False, skip: int = 0, limit: int = 10
-    ) -> List[NewsPage]:
+    ) -> List[NewsPageRead]:
         with db_session() as session:
             query = (
                 select(NewsPage)
@@ -82,5 +82,5 @@ class NewsPageServiceImpl(NewsPageServiceInterface):
                 .order_by(NewsPage.id)
                 .offset(skip)
             )
-            news_pages = session.exec(query).all()
-        return news_pages
+            news_pages = session.execute(query).scalars().all()
+            return [NewsPageRead.model_validate(news_page) for news_page in news_pages]

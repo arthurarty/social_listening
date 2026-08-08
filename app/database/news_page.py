@@ -10,6 +10,7 @@ class NewsPage(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     file_name: str
+    file_path: str
     news_paper_name: str
     page_number: int
     date_published: datetime

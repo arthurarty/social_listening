@@ -1,8 +1,8 @@
-"""create news page table
+"""Create news page table
 
-Revision ID: 610881d6096c
+Revision ID: 4b2251f4fc1b
 Revises:
-Create Date: 2026-08-02 16:58:45.567200
+Create Date: 2026-08-04 10:07:40.756798
 
 """
 
@@ -13,7 +13,7 @@ import sqlmodel
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "610881d6096c"
+revision: str = "4b2251f4fc1b"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -26,6 +26,7 @@ def upgrade() -> None:
         "newspage",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("file_name", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+        sa.Column("file_path", sqlmodel.sql.sqltypes.AutoString(), nullable=False),
         sa.Column(
             "news_paper_name", sqlmodel.sql.sqltypes.AutoString(), nullable=False
         ),

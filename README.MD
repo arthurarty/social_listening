@@ -59,6 +59,14 @@ To roll back a migration you can use the command:
 alembic downgrade -1
 ```
 
+### Database sessions
+`app/database/connection.py` exposes two ways to get a database session — pick based on how the code is invoked:
+
+- **`get_session()`** — a generator meant for FastAPI dependency injection. Wire it up via `Depends`, e.g. `SessionDep = Annotated[Session, Depends(get_session)]` (see `app/dependencies.py`). FastAPI drives the generator, so the session is opened per-request and closed automatically once the request finishes; commit/rollback of individual operations is left to the caller.
+- **`db_session()`** — a context manager for code that manages its own session lifecycle outside of a request (background jobs, scripts, service methods not wired through FastAPI's DI). Use it with `with db_session() as session:`; it commits automatically on success, rolls back on exception, and always closes the session. Pass `commit=False` if you want to control commits yourself.
+
+In short: use `get_session` (via `Depends`) in FastAPI route/dependency code, and use `db_session` as a `with` block anywhere else.
+
 ## Pre-commit hooks
 This repo uses [pre-commit](https://pre-commit.com/) to run `black`, `isort`, and `autoflake` before each commit.
 

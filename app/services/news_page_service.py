@@ -5,6 +5,8 @@ from pathlib import Path
 import aiofiles
 
 from app.config import settings
+from app.database.connection import db_session
+from app.database.news_page import NewsPage
 from app.schemas.news_page_schemas import NewsPageCreationRequest
 
 UPLOAD_DIR = Path(settings.file_upload_dir)
@@ -48,4 +50,13 @@ class NewsPageServiceImpl(NewsPageServiceInterface):
                 if not chunk:
                     break
                 await out_file.write(chunk)
+        news_page = NewsPage(
+            file_name=str(file.filename),
+            file_path=str(dest),
+            news_paper_name=creation_request.news_paper_name,
+            page_number=creation_request.page_number,
+            date_published=creation_request.date_published,
+        )
+        with db_session() as session:
+            session.add(news_page)
         return "Done"

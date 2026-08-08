@@ -1,8 +1,10 @@
 import uuid
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import List
 
 import aiofiles
+from sqlmodel import select
 
 from app.config import settings
 from app.database.connection import db_session
@@ -22,6 +24,14 @@ class NewsPageServiceInterface(ABC):
     async def create_news_page(self, creation_request: NewsPageCreationRequest) -> str:
         """
         Creates a news page
+        """
+
+    @abstractmethod
+    def get_news_pages(
+        self, processed: bool = False, skip: int = 0, limit: int = 10
+    ) -> List[NewsPage]:
+        """
+        Get news pages
         """
 
 
@@ -60,3 +70,17 @@ class NewsPageServiceImpl(NewsPageServiceInterface):
         with db_session() as session:
             session.add(news_page)
         return "Done"
+
+    def get_news_pages(
+        self, processed: bool = False, skip: int = 0, limit: int = 10
+    ) -> List[NewsPage]:
+        with db_session() as session:
+            query = (
+                select(NewsPage)
+                .where(NewsPage.processed == processed)
+                .limit(limit)
+                .order_by(NewsPage.id)
+                .offset(skip)
+            )
+            news_pages = session.exec(query).all()
+        return news_pages

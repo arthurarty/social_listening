@@ -6,6 +6,8 @@ from typing import Annotated
 import aiofiles
 from fastapi import APIRouter, Form, HTTPException, UploadFile, status
 
+from app.dependencies import NewsPageServiceDep
+
 UPLOAD_DIR = Path("local_files/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
 ALLOWED_TYPES = {"image/jpeg", "image/png"}
@@ -21,6 +23,7 @@ async def uploads_news_page(
     page_number: Annotated[int, Form()],
     date_published: Annotated[datetime, Form()],
     file: UploadFile,
+    news_page_service: NewsPageServiceDep,
 ):
     """
     Uploads an image of a news paper page

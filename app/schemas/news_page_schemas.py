@@ -13,4 +13,3 @@ class NewsPageCreationRequest(BaseModel):
     news_paper_name: str
     date_published: datetime
     file: UploadFile
-    file_name: str

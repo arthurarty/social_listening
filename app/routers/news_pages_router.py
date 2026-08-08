@@ -1,15 +1,11 @@
-import uuid
 from datetime import datetime
-from pathlib import Path
 from typing import Annotated
 
-import aiofiles
 from fastapi import APIRouter, Form, HTTPException, UploadFile, status
 
 from app.dependencies import NewsPageServiceDep
+from app.schemas.news_page_schemas import NewsPageCreationRequest
 
-UPLOAD_DIR = Path("local_files/uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
 ALLOWED_TYPES = {"image/jpeg", "image/png"}
 MAX_SIZE = 10 * 1024 * 1024  # 10MB
 
@@ -37,14 +33,13 @@ async def uploads_news_page(
         raise HTTPException(status.HTTP_413_CONTENT_TOO_LARGE, "File too large")
     if not file.filename:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Could not name file.")
-    ext = Path(file.filename).suffix
-    safe_name = f"{uuid.uuid4()}{ext}"
-    dest = UPLOAD_DIR / safe_name
 
-    async with aiofiles.open(dest, "wb") as out_file:
-        while True:
-            chunk = await file.read(1024 * 1024)
-            if not chunk:
-                break
-            await out_file.write(chunk)
-    return {"message": f"Page: {file.filename} scan uploaded"}
+    output = await news_page_service.create_news_page(
+        NewsPageCreationRequest(
+            page_number=page_number,
+            date_published=date_published,
+            file=file,
+            news_paper_name=news_paper_name,
+        )
+    )
+    return {"message": f"{output}"}

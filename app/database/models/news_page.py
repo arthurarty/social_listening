@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy import Column
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
 
 
@@ -14,4 +16,5 @@ class NewsPage(SQLModel, table=True):
     news_paper_name: str
     page_number: int
     date_published: datetime
+    article_json: list[dict] | None = Field(default=None, sa_column=Column(JSONB))
     processed: bool = Field(default=False)

@@ -24,9 +24,6 @@ async def uploads_news_page(
     """
     Uploads an image of a news paper page
     """
-    assert news_paper_name
-    assert page_number
-    assert date_published
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unsupported file type")
     if (not file.size) or file.size > MAX_SIZE:

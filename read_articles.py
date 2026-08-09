@@ -2,7 +2,7 @@ import time
 
 from app.services.instances import news_page_service
 from app.utils.extract_text import extract_text_from_image
-from app.utils.write_md import write_json_file
+from app.utils.write_md import write_md_file
 
 
 def main():
@@ -19,12 +19,12 @@ def main():
     for news_page in news_pages:
         extracted_text = extract_text_from_image(news_page.file_path)
         start_time = time.time()
-        write_json_file(
+        write_md_file(
             image_path=news_page.file_path,
             ocr_text=extracted_text,
-            output_file=f"{news_page.id}_file.json",
+            output_file=f"{news_page.id}_file.MD",
         )
-        print(f"write_json_file took {time.time() - start_time:.2f} seconds")
+        print(f"write_md_file took {time.time() - start_time:.2f} seconds")
 
 
 # news_page_service.update_news_page_articles(news_page_id=1, articles=articles)

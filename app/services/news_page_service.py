@@ -4,11 +4,13 @@ from pathlib import Path
 from typing import List
 
 import aiofiles
+from sqlalchemy import update
 from sqlmodel import select
 
 from app.config import settings
 from app.database.connection import db_session
 from app.database.models.news_page import NewsPage
+from app.schemas.article_schema import Article
 from app.schemas.news_page_schemas import NewsPageCreationRequest, NewsPageRead
 
 UPLOAD_DIR = Path(settings.file_upload_dir)
@@ -32,6 +34,14 @@ class NewsPageServiceInterface(ABC):
     ) -> List[NewsPageRead]:
         """
         Get news pages
+        """
+
+    @abstractmethod
+    def update_news_page_articles(
+        self, news_page_id: int, articles: List[Article]
+    ) -> None:
+        """
+        Update the articles field of a news page.
         """
 
 
@@ -84,3 +94,19 @@ class NewsPageServiceImpl(NewsPageServiceInterface):
             )
             news_pages = session.execute(query).scalars().all()
             return [NewsPageRead.model_validate(news_page) for news_page in news_pages]
+
+    def update_news_page_articles(
+        self, news_page_id: int, articles: List[Article]
+    ) -> None:
+        """
+        Update the articles field of a news page. Method overwrites the existing articles
+        """
+        article_dicts = [article.model_dump() for article in articles]
+        with db_session() as session:
+            query = (
+                update(NewsPage)
+                .where(NewsPage.id == news_page_id)
+                .values(article_json=article_dicts)
+            )
+            session.execute(query)
+        return None

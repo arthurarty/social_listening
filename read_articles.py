@@ -14,7 +14,7 @@ def main():
     3. Creates json using an visual model and the extracted text
     4. Updates the news page
     """
-    news_pages = news_page_service.get_news_pages(limit=1)
+    news_pages = news_page_service.get_news_pages(limit=2)
 
     for news_page in news_pages:
         extracted_text = extract_text_from_image(news_page.file_path)

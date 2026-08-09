@@ -1,14 +1,8 @@
-from app.schemas.article_schema import Article
+import time
+
 from app.services.instances import news_page_service
 from app.utils.extract_text import extract_text_from_image
-
-articles = [
-    Article(
-        headline="Uganda airlines to Kigali",
-        body="Uganda Airlines will be flying to kigali",
-        author="Jack Ma",
-    )
-]
+from app.utils.write_md import write_json_file
 
 
 def main():
@@ -24,10 +18,14 @@ def main():
 
     for news_page in news_pages:
         extracted_text = extract_text_from_image(news_page.file_path)
-        print(extracted_text)
+        start_time = time.time()
+        write_json_file(
+            image_path=news_page.file_path,
+            ocr_text=extracted_text,
+            output_file=f"{news_page.id}_file.json",
+        )
+        print(f"write_json_file took {time.time() - start_time:.2f} seconds")
 
-
-# print(news_pages)
 
 # news_page_service.update_news_page_articles(news_page_id=1, articles=articles)
 

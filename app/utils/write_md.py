@@ -12,7 +12,7 @@ Your task:
 - Use the image to identify the visual structure of the page (headline, byline, subheadings, captions, pull quotes) and apply matching markdown headings and formatting.
 - Use a single "#" for the main headline, "##" for section/article subheadings, and "###" for any smaller subheadings, matching their visual hierarchy in the image.
 - Render bylines and captions as italics, and pull quotes as blockquotes.
-- If the page contains multiple articles, separate each with a horizontal rule ("---").
+- If the page contains multiple articles or columns, separate each with a horizontal rule ("---").
 - Output only the final markdown content, with no commentary, explanations, or code fences.
 """
 

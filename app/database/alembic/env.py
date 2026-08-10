@@ -12,6 +12,7 @@ from sqlmodel import SQLModel
 from app.config import settings
 from app.database.models import (  # noqa: F401  (registers models on SQLModel.metadata)
     news_page,
+    twitter_posts,
 )
 
 # this is the Alembic Config object, which provides

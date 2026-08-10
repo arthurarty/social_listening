@@ -1,6 +1,8 @@
 from app.services.news_page_service import NewsPageServiceImpl, NewsPageServiceInterface
+from app.services.twitter_service import TwitterServiceImpl
 
 news_page_service: NewsPageServiceImpl = NewsPageServiceImpl()
+twitter_service: TwitterServiceImpl = TwitterServiceImpl()
 
 
 def get_news_page_service() -> NewsPageServiceInterface:

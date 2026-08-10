@@ -1,7 +1,5 @@
 import re
 
-from app.services.instances import twitter_service
-
 MENTION_OR_HASHTAG_PATTERN = re.compile(r"[@#]\w+")
 EMOJI_PATTERN = re.compile(
     "["
@@ -23,12 +21,3 @@ def clean_tweet(tweet: str) -> str:
     tweet = MENTION_OR_HASHTAG_PATTERN.sub("", tweet)
     tweet = EMOJI_PATTERN.sub("", tweet)
     return re.sub(r"\s+", " ", tweet).strip()
-
-
-def main():
-    tweets = twitter_service.get_tweets_as_text(limit=10)
-    cleaned_tweets = [clean_tweet(tweet) for tweet in tweets]
-    print(cleaned_tweets)
-
-
-main()

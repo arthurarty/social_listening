@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any, Dict, List
 
 from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlmodel import select
 
 from app.database.connection import db_session
 from app.database.models.tweets import Tweet
@@ -36,6 +37,14 @@ class TwitterServiceInterface(ABC):
     def store_tweets(self, tweets: List[Tweet]) -> str:
         """
         Persists the tweets to the database
+        """
+
+    @abstractmethod
+    def get_tweets_as_text(
+        self, tweet_lang: str | None = None, limit: int = 100, skip: int = 0
+    ) -> List[str]:
+        """
+        Return only the text of the tweets, optionally filtered by language
         """
 
 
@@ -138,3 +147,16 @@ class TwitterServiceImpl(TwitterServiceInterface):
         with db_session() as session:
             session.execute(stmt)
         return "Done"
+
+    def get_tweets_as_text(
+        self, tweet_lang: str | None = None, limit: int = 100, skip: int = 0
+    ) -> List[str]:
+        """
+        Return only the text of the tweets, optionally filtered by language
+        """
+        statement = select(Tweet.text).order_by(Tweet.id).offset(skip).limit(limit)
+        if tweet_lang is not None:
+            statement = statement.where(Tweet.lang == tweet_lang)
+
+        with db_session() as session:
+            return list(session.execute(statement).scalars().all())

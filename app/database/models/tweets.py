@@ -5,9 +5,9 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
 
 
-class TwitterPost(SQLModel, table=True):
+class Tweets(SQLModel, table=True):
     """
-    Represents a single twitter/post
+    Represents a single tweet (twitter posts)
     """
 
     id: int | None = Field(default=None, primary_key=True)

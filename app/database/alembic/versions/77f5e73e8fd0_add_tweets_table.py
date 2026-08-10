@@ -1,8 +1,8 @@
 """Add tweets table
 
-Revision ID: 88e8d8a20cfa
+Revision ID: 77f5e73e8fd0
 Revises: 7654d934a365
-Create Date: 2026-08-10 14:33:13.067926
+Create Date: 2026-08-10 15:52:20.257561
 
 """
 
@@ -14,7 +14,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "88e8d8a20cfa"
+revision: str = "77f5e73e8fd0"
 down_revision: Union[str, Sequence[str], None] = "7654d934a365"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

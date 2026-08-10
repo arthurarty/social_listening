@@ -5,10 +5,12 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
 
 
-class Tweets(SQLModel, table=True):
+class Tweet(SQLModel, table=True):
     """
     Represents a single tweet (twitter posts)
     """
+
+    __tablename__ = "tweets"  # type: ignore[assignment]
 
     id: int | None = Field(default=None, primary_key=True)
     tweet_id: str = Field(unique=True)

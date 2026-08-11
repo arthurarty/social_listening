@@ -8,7 +8,7 @@ class CategoryCreate(BaseModel):
 
     name: str
     description: str
-    examples: str
+    examples: list[str]
 
 
 class CategoryRead(BaseModel):
@@ -19,7 +19,7 @@ class CategoryRead(BaseModel):
     id: int
     name: str
     description: str
-    examples: str
+    examples: list[str]
 
     class Config:
         from_attributes = True

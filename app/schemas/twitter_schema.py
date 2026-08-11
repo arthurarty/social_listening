@@ -242,4 +242,13 @@ class TweetSearchResult(BaseModel):
     tweets: list[TweetResult] = []
 
 
+class TweetMinimal(BaseModel):
+    """
+    A scaled down version of the tweet that has just the internal id and the text of the post
+    """
+
+    id: int
+    text: str
+
+
 TweetResult.model_rebuild()

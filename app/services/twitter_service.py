@@ -7,7 +7,7 @@ from sqlmodel import select
 
 from app.database.connection import db_session
 from app.database.models.tweets import Tweet
-from app.schemas.twitter_schema import TweetResult, TweetSearchResult
+from app.schemas.twitter_schema import TweetMinimal, TweetResult, TweetSearchResult
 
 TWITTER_CREATED_AT_FORMAT = "%a %b %d %H:%M:%S %z %Y"
 
@@ -160,3 +160,31 @@ class TwitterServiceImpl(TwitterServiceInterface):
 
         with db_session() as session:
             return list(session.execute(statement).scalars().all())
+
+    def get_tweets(
+        self, tweet_lang: str | None = None, limit: int = 25, skip: int = 0
+    ) -> List[Tweet]:
+        """
+        Read tweets from the database.
+        """
+        statement = select(Tweet).order_by(Tweet.id).offset(skip).limit(limit)
+        if tweet_lang is not None:
+            statement = statement.where(Tweet.lang == tweet_lang)
+        with db_session() as session:
+            return list(session.execute(statement).scalars().all())
+
+    def get_tweets_minimal(
+        self, tweet_lang: str | None = None, limit: int = 25, skip: int = 0
+    ) -> List[TweetMinimal]:
+        """
+        Reads tweets from the database and only returns id and the tweet text.
+        """
+        statement = (
+            select(Tweet.id, Tweet.text).order_by(Tweet.id).offset(skip).limit(limit)
+        )
+        if tweet_lang is not None:
+            statement = statement.where(Tweet.lang == tweet_lang)
+
+        with db_session() as session:
+            rows = session.execute(statement).all()
+            return [TweetMinimal(id=row.id, text=row.text) for row in rows]

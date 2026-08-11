@@ -1,8 +1,8 @@
 import time
 
+from app.llms.write_md import write_md_file
 from app.services.instances import news_page_service
 from app.utils.extract_text import extract_text_from_image
-from app.utils.write_md import write_md_file
 
 
 def main():

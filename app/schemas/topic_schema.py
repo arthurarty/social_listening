@@ -3,9 +3,9 @@ from typing import List
 from pydantic import BaseModel
 
 
-class CategoryCreate(BaseModel):
+class TopicCreate(BaseModel):
     """
-    Schema for request to create a category
+    Schema for request to create a topic
     """
 
     name: str
@@ -13,9 +13,9 @@ class CategoryCreate(BaseModel):
     examples: list[str]
 
 
-class CategoryRead(BaseModel):
+class TopicRead(BaseModel):
     """
-    Schema for returning a category
+    Schema for returning a topic
     """
 
     id: int
@@ -34,8 +34,8 @@ class CategorizedTweetOutput(BaseModel):
 
     tweet_id: int
     tweet_text: str
-    category_id: int
-    category_name: str
+    topic_id: int
+    topic_name: str
 
 
 class CategorizedTweetsOutput(BaseModel):

@@ -3,12 +3,13 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
 
 
-class Category(SQLModel, table=True):
+class Topic(SQLModel, table=True):
     """
-    Represents a category that a tweet or post belongs to
+    User posts will be grouped into topics.
+    This table stores the various topics we have.
     """
 
-    __tablename__ = "categories"  # type: ignore[assignment]
+    __tablename__ = "topics"  # type: ignore[assignment]
 
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(unique=True)

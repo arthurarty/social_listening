@@ -42,4 +42,4 @@ class Tweet(SQLModel, table=True):
     is_limited_reply: bool = Field(default=False)
     community_info: dict | None = Field(default=None, sa_column=Column(JSONB))
     article: dict | None = Field(default=None, sa_column=Column(JSONB))
-    category: int | None = Field(default=None, foreign_key="categories.id")
+    topic_id: int | None = Field(default=None, foreign_key="topics.id")

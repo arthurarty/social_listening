@@ -1,7 +1,7 @@
 from sqlmodel import SQLModel
 
 # Deterministic naming convention for constraints/indexes so Alembic
-# autogenerate always emits real constraint names (e.g. "fk_tweets_category_categories")
+# autogenerate always emits real constraint names (e.g. "fk_tweets_topic_id_topics")
 # instead of leaving them unnamed, which left the downgrade in
 # b4adc78485bc_add_categories_table.py unable to reference the foreign key it created.
 NAMING_CONVENTION = {

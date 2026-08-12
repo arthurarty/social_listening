@@ -188,3 +188,8 @@ class TwitterServiceImpl(TwitterServiceInterface):
         with db_session() as session:
             rows = session.execute(statement).all()
             return [TweetMinimal(id=row.id, text=row.text) for row in rows]
+
+    # def bulk_update_tweet_topic(self, tweet_id: int, topic_id: int) -> None:
+    #     """
+    #     A bulk update
+    #     """

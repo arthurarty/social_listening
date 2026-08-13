@@ -2,7 +2,7 @@ import time
 
 from app.llms.categorize_tweet import main
 
-SLEEP_TIMER = 15
+SLEEP_TIMER = 10
 TOTAL_BATCHES = 10
 
 for i in range(TOTAL_BATCHES):

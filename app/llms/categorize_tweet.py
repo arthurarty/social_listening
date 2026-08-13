@@ -67,10 +67,12 @@ def categorize_tweets(
     return CategorizedTweetsOutput.model_validate_json(output)
 
 
-def main(no_of_tweets: int = 3, skip: int = 0):
+def main(no_of_tweets: int = 3, skip: int = 0) -> int:
     """
     Read tweets from the database and assign them into topics.
     The topics exist in the topics table.
+
+    Returns no of tweets read from the database
     """
     with contextmanager(get_session)() as session:
         topics = topic_service.get_topics(session)
@@ -78,7 +80,10 @@ def main(no_of_tweets: int = 3, skip: int = 0):
     tweets = twitter_service.get_tweets_minimal(
         tweet_lang="en", limit=no_of_tweets, skip=skip, is_categorized=False
     )
+    if len(tweets) == 0:
+        return 0
     categorized_tweets = categorize_tweets(tweets, topics_data)
     print(f"Categorized_Tweets: {len(categorized_tweets.categorized_tweets)}")
     twitter_service.bulk_update_tweet_topic(categorized_tweets)
     print("Done")
+    return len(tweets)

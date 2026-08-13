@@ -184,7 +184,11 @@ class TwitterServiceImpl(TwitterServiceInterface):
             return list(session.execute(statement).scalars().all())
 
     def get_tweets_minimal(
-        self, tweet_lang: str | None = None, limit: int = 25, skip: int = 0
+        self,
+        tweet_lang: str | None = None,
+        limit: int = 25,
+        skip: int = 0,
+        is_categorized: bool | None = None,
     ) -> List[TweetMinimal]:
         """
         Reads tweets from the database and only returns id and the tweet text.
@@ -194,9 +198,13 @@ class TwitterServiceImpl(TwitterServiceInterface):
         )
         if tweet_lang is not None:
             statement = statement.where(Tweet.lang == tweet_lang)
+        if is_categorized:
+            statement = statement.where(Tweet.topic_id.is_not(None))
+        if is_categorized is False:
+            statement = statement.where(Tweet.topic_id.is_(None))
         with db_session() as session:
             rows = session.execute(statement).all()
-            return [TweetMinimal(id=row.id, text=row.text) for row in rows]
+            return [TweetMinimal(id=row.id, text=row.text[:250]) for row in rows]
 
     def bulk_update_tweet_topic(
         self, categorized_tweets_output: CategorizedTweetsOutput

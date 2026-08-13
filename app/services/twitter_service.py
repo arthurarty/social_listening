@@ -2,11 +2,13 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, List
 
+from sqlalchemy import update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlmodel import select
 
 from app.database.connection import db_session
 from app.database.models.tweets import Tweet
+from app.schemas.topic_schema import CategorizedTweetsOutput
 from app.schemas.twitter_schema import TweetMinimal, TweetResult, TweetSearchResult
 
 TWITTER_CREATED_AT_FORMAT = "%a %b %d %H:%M:%S %z %Y"
@@ -45,6 +47,14 @@ class TwitterServiceInterface(ABC):
     ) -> List[str]:
         """
         Return only the text of the tweets, optionally filtered by language
+        """
+
+    @abstractmethod
+    def bulk_update_tweet_topic(
+        self, categorized_tweets_output: CategorizedTweetsOutput
+    ) -> None:
+        """
+        A bulk update topics for given tweets
         """
 
 
@@ -174,7 +184,11 @@ class TwitterServiceImpl(TwitterServiceInterface):
             return list(session.execute(statement).scalars().all())
 
     def get_tweets_minimal(
-        self, tweet_lang: str | None = None, limit: int = 25, skip: int = 0
+        self,
+        tweet_lang: str | None = None,
+        limit: int = 25,
+        skip: int = 0,
+        is_categorized: bool | None = None,
     ) -> List[TweetMinimal]:
         """
         Reads tweets from the database and only returns id and the tweet text.
@@ -184,12 +198,23 @@ class TwitterServiceImpl(TwitterServiceInterface):
         )
         if tweet_lang is not None:
             statement = statement.where(Tweet.lang == tweet_lang)
-
+        if is_categorized:
+            statement = statement.where(Tweet.topic_id.is_not(None))
+        if is_categorized is False:
+            statement = statement.where(Tweet.topic_id.is_(None))
         with db_session() as session:
             rows = session.execute(statement).all()
-            return [TweetMinimal(id=row.id, text=row.text) for row in rows]
+            return [TweetMinimal(id=row.id, text=row.text[:250]) for row in rows]
 
-    # def bulk_update_tweet_topic(self, tweet_id: int, topic_id: int) -> None:
-    #     """
-    #     A bulk update
-    #     """
+    def bulk_update_tweet_topic(
+        self, categorized_tweets_output: CategorizedTweetsOutput
+    ) -> None:
+        """
+        A bulk update topics for given tweets
+        """
+        tweet_dicts = [
+            {"id": tweet.tweet_id, "topic_id": tweet.topic_id}
+            for tweet in categorized_tweets_output.categorized_tweets
+        ]
+        with db_session() as session:
+            session.execute(update(Tweet), tweet_dicts)

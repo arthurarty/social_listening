@@ -3,11 +3,13 @@ Categorize a tweet.
 """
 
 from contextlib import contextmanager
+from typing import Any, Dict, List
 
 from ollama import chat
 
 from app.database.connection import get_session
 from app.schemas.topic_schema import CategorizedTweetsOutput, TopicRead
+from app.schemas.twitter_schema import TweetMinimal
 from app.services.instances import topic_service, twitter_service
 
 SYSTEM_PROMPT = """
@@ -31,17 +33,13 @@ Your task:
 """
 
 
-def main(no_of_tweets: int = 3, skip: int = 0):
+def categorize_tweets(
+    tweets: List[TweetMinimal], topics_data: List[Dict[str, Any]]
+) -> CategorizedTweetsOutput:
     """
-    Read tweets from the database and assign them into topics.
-    The topics exist in the topics table.
+    Using an LLM assign a category to each tweet.
     """
-    with contextmanager(get_session)() as session:
-        topics = topic_service.get_topics(session)
-        topics_data = [TopicRead.model_validate(topic).model_dump() for topic in topics]
-    tweets = twitter_service.get_tweets_minimal(
-        tweet_lang="en", limit=no_of_tweets, skip=skip
-    )
+    print(f"Categorizing {len(tweets)} tweets.")
     response = chat(
         model="gemma4",
         messages=[
@@ -60,8 +58,32 @@ def main(no_of_tweets: int = 3, skip: int = 0):
             "seed": 42,
         },
     )
-
-    if response.message.content is None:
+    output = response.message.content
+    if isinstance(output, str):
+        print(f"Output is: {output}")
+        output = output.strip()
+    if output is None:
         raise ValueError("Model returned an empty response")
+    return CategorizedTweetsOutput.model_validate_json(output)
 
-    return CategorizedTweetsOutput.model_validate_json(response.message.content)
+
+def main(no_of_tweets: int = 3, skip: int = 0) -> int:
+    """
+    Read tweets from the database and assign them into topics.
+    The topics exist in the topics table.
+
+    Returns no of tweets read from the database
+    """
+    with contextmanager(get_session)() as session:
+        topics = topic_service.get_topics(session)
+        topics_data = [TopicRead.model_validate(topic).model_dump() for topic in topics]
+    tweets = twitter_service.get_tweets_minimal(
+        tweet_lang="en", limit=no_of_tweets, skip=skip, is_categorized=False
+    )
+    if len(tweets) == 0:
+        return 0
+    categorized_tweets = categorize_tweets(tweets, topics_data)
+    print(f"Categorized_Tweets: {len(categorized_tweets.categorized_tweets)}")
+    twitter_service.bulk_update_tweet_topic(categorized_tweets)
+    print("Done")
+    return len(tweets)

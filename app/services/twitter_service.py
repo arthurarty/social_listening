@@ -2,11 +2,13 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, List
 
+from sqlalchemy import update
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlmodel import select
 
 from app.database.connection import db_session
 from app.database.models.tweets import Tweet
+from app.schemas.topic_schema import CategorizedTweetsOutput
 from app.schemas.twitter_schema import TweetMinimal, TweetResult, TweetSearchResult
 
 TWITTER_CREATED_AT_FORMAT = "%a %b %d %H:%M:%S %z %Y"
@@ -45,6 +47,14 @@ class TwitterServiceInterface(ABC):
     ) -> List[str]:
         """
         Return only the text of the tweets, optionally filtered by language
+        """
+
+    @abstractmethod
+    def bulk_update_tweet_topic(
+        self, categorized_tweets_output: CategorizedTweetsOutput
+    ) -> None:
+        """
+        A bulk update topics for given tweets
         """
 
 
@@ -184,12 +194,19 @@ class TwitterServiceImpl(TwitterServiceInterface):
         )
         if tweet_lang is not None:
             statement = statement.where(Tweet.lang == tweet_lang)
-
         with db_session() as session:
             rows = session.execute(statement).all()
             return [TweetMinimal(id=row.id, text=row.text) for row in rows]
 
-    # def bulk_update_tweet_topic(self, tweet_id: int, topic_id: int) -> None:
-    #     """
-    #     A bulk update
-    #     """
+    def bulk_update_tweet_topic(
+        self, categorized_tweets_output: CategorizedTweetsOutput
+    ) -> None:
+        """
+        A bulk update topics for given tweets
+        """
+        tweet_dicts = [
+            {"id": tweet.tweet_id, "topic_id": tweet.topic_id}
+            for tweet in categorized_tweets_output.categorized_tweets
+        ]
+        with db_session() as session:
+            session.execute(update(Tweet), tweet_dicts)

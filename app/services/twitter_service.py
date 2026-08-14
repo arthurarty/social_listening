@@ -9,7 +9,12 @@ from sqlmodel import select
 from app.database.connection import db_session
 from app.database.models.tweets import Tweet
 from app.schemas.topic_schema import CategorizedTweetsOutput
-from app.schemas.twitter_schema import TweetMinimal, TweetResult, TweetSearchResult
+from app.schemas.twitter_schema import (
+    TweetMinimal,
+    TweetResult,
+    TweetSearchResult,
+    TweetSentimentList,
+)
 
 TWITTER_CREATED_AT_FORMAT = "%a %b %d %H:%M:%S %z %Y"
 
@@ -189,6 +194,7 @@ class TwitterServiceImpl(TwitterServiceInterface):
         limit: int = 25,
         skip: int = 0,
         is_categorized: bool | None = None,
+        has_sentiment: bool | None = None,
     ) -> List[TweetMinimal]:
         """
         Reads tweets from the database and only returns id and the tweet text.
@@ -202,6 +208,10 @@ class TwitterServiceImpl(TwitterServiceInterface):
             statement = statement.where(Tweet.topic_id.is_not(None))
         if is_categorized is False:
             statement = statement.where(Tweet.topic_id.is_(None))
+        if has_sentiment:
+            statement = statement.where(Tweet.sentiment.is_not(None))
+        if has_sentiment is False:
+            statement = statement.where(Tweet.sentiment.is_(None))
         with db_session() as session:
             rows = session.execute(statement).all()
             return [TweetMinimal(id=row.id, text=row.text[:250]) for row in rows]
@@ -215,6 +225,19 @@ class TwitterServiceImpl(TwitterServiceInterface):
         tweet_dicts = [
             {"id": tweet.tweet_id, "topic_id": tweet.topic_id}
             for tweet in categorized_tweets_output.categorized_tweets
+        ]
+        with db_session() as session:
+            session.execute(update(Tweet), tweet_dicts)
+
+    def bulk_update_tweet_sentiment(
+        self, tweet_sentiment_list: TweetSentimentList
+    ) -> None:
+        """
+        A bulk update for the sentiment column for given tweets
+        """
+        tweet_dicts = [
+            {"id": tweet.id, "sentiment": tweet.sentiment.value}
+            for tweet in tweet_sentiment_list.tweets
         ]
         with db_session() as session:
             session.execute(update(Tweet), tweet_dicts)

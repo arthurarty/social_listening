@@ -1,20 +1,8 @@
 from datetime import datetime
-from enum import StrEnum, auto
 
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
-
-
-class SentimentEnum(StrEnum):
-    """
-    Options for setting sentiment
-    """
-
-    POSITIVE = auto()
-    NEGATIVE = auto()
-    NEUTRAL = auto()
-    MIXED = auto()
 
 
 class Tweet(SQLModel, table=True):

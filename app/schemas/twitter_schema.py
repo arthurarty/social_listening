@@ -1,8 +1,20 @@
 from __future__ import annotations
 
-from typing import Any
+from enum import StrEnum, auto
+from typing import Any, List
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+class SentimentEnum(StrEnum):
+    """
+    Options for setting sentiment
+    """
+
+    POSITIVE = auto()
+    NEGATIVE = auto()
+    NEUTRAL = auto()
+    MIXED = auto()
 
 
 class UrlEntityDetail(BaseModel):
@@ -249,6 +261,24 @@ class TweetMinimal(BaseModel):
 
     id: int
     text: str
+
+
+class TweetSentiment(BaseModel):
+    """
+    A tweet and the sentiment assigned to it.
+    """
+
+    id: int
+    text: str
+    sentiment: SentimentEnum
+
+
+class TweetSentimentList(BaseModel):
+    """
+    A list of tweets and the sentiment assigned to each
+    """
+
+    tweets: List[TweetSentiment]
 
 
 TweetResult.model_rebuild()

@@ -2,11 +2,14 @@
 Categorize a tweet.
 """
 
+from contextlib import contextmanager
 from typing import Any, Dict, List
 
 from ollama import chat
 
+from app.database.connection import get_session
 from app.schemas.twitter_schema import TweetMinimal, TweetSentimentList
+from app.services.instances import twitter_service
 
 SYSTEM_PROMPT = """You are a sentiment classifier for airline-related tweets.
 
@@ -83,7 +86,7 @@ SENTIMENT_DICT = {
 
 
 def analyze_tweets(
-    tweets: List[TweetMinimal], sentiment_data: List[Dict[str, Any]]
+    tweets: List[TweetMinimal], sentiment_data: Dict[str, Any]
 ) -> TweetSentimentList:
     """
     Using an LLM figure the sentiment of a tweet.
@@ -116,23 +119,20 @@ def analyze_tweets(
     return TweetSentimentList.model_validate_json(output)
 
 
-# def main(no_of_tweets: int = 3, skip: int = 0) -> int:
-#     """
-#     Read tweets from the database and assign them into topics.
-#     The topics exist in the topics table.
+def main(no_of_tweets: int = 3, skip: int = 0) -> int:
+    """
+    Read tweets from the database and run sentiment analysis.
 
-#     Returns no of tweets read from the database
-#     """
-#     with contextmanager(get_session)() as session:
-#         topics = topic_service.get_topics(session)
-#         topics_data = [TopicRead.model_validate(topic).model_dump() for topic in topics]
-#     tweets = twitter_service.get_tweets_minimal(
-#         tweet_lang="en", limit=no_of_tweets, skip=skip, is_categorized=False
-#     )
-#     if len(tweets) == 0:
-#         return 0
-#     categorized_tweets = categorize_tweets(tweets, topics_data)
-#     print(f"Categorized_Tweets: {len(categorized_tweets.categorized_tweets)}")
-#     twitter_service.bulk_update_tweet_topic(categorized_tweets)
-#     print("Done")
-#     return len(tweets)
+    Returns no of tweets read from the database
+    """
+    with contextmanager(get_session)() as session:
+        tweets = twitter_service.get_tweets_minimal(
+            tweet_lang="en", limit=no_of_tweets, skip=skip, is_categorized=False
+        )
+    if len(tweets) == 0:
+        return 0
+    analyzed_tweets = analyze_tweets(tweets, sentiment_data=SENTIMENT_DICT)
+    print(f"Analyzed_Tweets: {len(analyzed_tweets.tweets)}")
+    twitter_service.bulk_update_tweet_sentiment(analyzed_tweets)
+    print("Done")
+    return len(tweets)

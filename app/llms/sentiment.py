@@ -28,14 +28,15 @@ Task:
 - If a tweet seems to fit more than one label, pick the single best match.
 
 Output:
-- Return a JSON array with one object per tweet, in the same order given.
+- Return a JSON object with a single key "tweets", whose value is a list with
+  one object per tweet, in the same order given.
 - Each object must have exactly two keys: "tweet_id" and "sentiment".
 - Copy tweet_id exactly as given.
 - "sentiment" must be exactly one of: positive, negative, neutral, mixed.
-- Output only the JSON array. No explanation, no extra text, no markdown fences.
+- Output only the JSON object. No explanation, no extra text, no markdown fences.
 
 Example output:
-[{"tweet_id": "1", "sentiment": "negative"}, {"tweet_id": "2", "sentiment": "neutral"}]
+{"tweets": [{"tweet_id": 1, "sentiment": "negative"}, {"tweet_id": 2, "sentiment": "neutral"}]}
 """
 
 

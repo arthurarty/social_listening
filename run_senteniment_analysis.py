@@ -2,8 +2,8 @@ import time
 
 from app.llms.sentiment import main
 
-SLEEP_TIMER = 3
-TOTAL_BATCHES = 10
+SLEEP_TIMER = 5
+TOTAL_BATCHES = 5
 
 
 for i in range(TOTAL_BATCHES):

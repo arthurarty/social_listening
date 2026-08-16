@@ -214,7 +214,7 @@ class TwitterServiceImpl(TwitterServiceInterface):
             statement = statement.where(Tweet.sentiment.is_(None))
         with db_session() as session:
             rows = session.execute(statement).all()
-            return [TweetMinimal(id=row.id, text=row.text[:250]) for row in rows]
+            return [TweetMinimal(id=row.id, text=row.text[:220]) for row in rows]
 
     def bulk_update_tweet_topic(
         self, categorized_tweets_output: CategorizedTweetsOutput
@@ -236,7 +236,7 @@ class TwitterServiceImpl(TwitterServiceInterface):
         A bulk update for the sentiment column for given tweets
         """
         tweet_dicts = [
-            {"id": tweet.id, "sentiment": tweet.sentiment.value}
+            {"id": tweet.tweet_id, "sentiment": tweet.sentiment.value}
             for tweet in tweet_sentiment_list.tweets
         ]
         with db_session() as session:

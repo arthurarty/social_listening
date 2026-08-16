@@ -2,12 +2,10 @@
 Categorize a tweet.
 """
 
-from contextlib import contextmanager
 from typing import Any, Dict, List
 
 from ollama import chat
 
-from app.database.connection import get_session
 from app.schemas.twitter_schema import TweetMinimal, TweetSentimentList
 from app.services.instances import twitter_service
 
@@ -125,11 +123,11 @@ def main(no_of_tweets: int = 3, skip: int = 0) -> int:
 
     Returns no of tweets read from the database
     """
-    with contextmanager(get_session)() as session:
-        tweets = twitter_service.get_tweets_minimal(
-            tweet_lang="en", limit=no_of_tweets, skip=skip, is_categorized=False
-        )
+    tweets = twitter_service.get_tweets_minimal(
+        tweet_lang="en", limit=no_of_tweets, skip=skip, has_sentiment=False
+    )
     if len(tweets) == 0:
+        print("No tweets to process")
         return 0
     analyzed_tweets = analyze_tweets(tweets, sentiment_data=SENTIMENT_DICT)
     print(f"Analyzed_Tweets: {len(analyzed_tweets.tweets)}")

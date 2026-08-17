@@ -268,8 +268,7 @@ class TweetSentiment(BaseModel):
     A tweet and the sentiment assigned to it.
     """
 
-    id: int
-    text: str
+    tweet_id: int
     sentiment: SentimentEnum
 
 

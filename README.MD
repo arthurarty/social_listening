@@ -1,5 +1,7 @@
 # Social Listening
-A social listening tool built in python. Makes use of external APIs to pull data from social media.
+A social listening tool built in python.  
+The goal is have an understanding of how a brand is perceived by people by analyzing their posts.
+Makes use of external APIs to pull data from social media.
 Using OCR and a multimodal LLM to process the image of a news paper page.
 
 # Running the app
@@ -82,10 +84,3 @@ uvicorn app.main:app --reload
 ```
 
 The app will be available at http://127.0.0.1:8000.
-
-# Data sources
-## Third Party APIS considered
-- Twitter - https://docs.twitterapi.io/api-reference/endpoint/tweet_advanced_search - pay as you go
-- Twitter - https://sorsa.io/ - Starting at $50 a month
-
-- All platforms - https://www.netrows.com/ - starting at $30 a month

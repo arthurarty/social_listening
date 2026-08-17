@@ -69,6 +69,9 @@ SENTIMENT_DICT = {
             "Flight 812 was delayed by two hours due to weather.",
             "The airline announced it will cut three regional routes starting in October.",
             "The airline's fleet consists mainly of Boeing 737 and Airbus A320 aircraft.",
+            "The idea of picking an Ethiopian for Team Leader at Uganda Airlines gets justification. Let's get the best out of the Ethiopian we have, for the time we have him.",
+            "Until it gets to the point of Uganda Airlines",
+            "Rwanda air is the same as Uganda Airlines. Uganda and Rwanda is the same..one passport await",
         ],
     },
     "mixed": {

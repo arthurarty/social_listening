@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     tweet_api_io: str
     anthropic_api_key: str
     log_level: int = logging.INFO
-    claude_model: str = "claude-sonnet-5"
+    claude_sonnet_model: str = "claude-sonnet-5"
     model_config = SettingsConfigDict(env_file=".env")
 
 

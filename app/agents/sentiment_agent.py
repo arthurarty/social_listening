@@ -1,13 +1,8 @@
-"""
-Categorize a tweet.
-"""
+from langchain.agents import create_agent
+from langchain.chat_models import init_chat_model
 
-from typing import Any, Dict, List
-
-from ollama import chat
-
-from app.schemas.twitter_schema import TweetMinimal, TweetSentimentList
-from app.services.instances import twitter_service
+from app.config import settings
+from app.schemas.twitter_schema import TweetSentimentList
 
 SYSTEM_PROMPT = """You are a sentiment classifier for airline-related tweets.
 
@@ -87,54 +82,17 @@ SENTIMENT_DICT = {
 }
 
 
-def analyze_tweets(
-    tweets: List[TweetMinimal], sentiment_data: Dict[str, Any]
-) -> TweetSentimentList:
-    """
-    Using an LLM figure the sentiment of a tweet.
-    """
-    print(f"Analyzing {len(tweets)} tweets.")
-    response = chat(
-        model="gemma4",
-        messages=[
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT,
-            },
-            {
-                "role": "user",
-                "content": f"Sentiment Data: {sentiment_data}\n\nTweets: {tweets}",
-            },
-        ],
-        format=TweetSentimentList.model_json_schema(),
-        options={
-            "temperature": 0,
-            "seed": 42,
-        },
-    )
-    output = response.message.content
-    if isinstance(output, str):
-        print(f"Output is: {output}")
-        output = output.strip()
-    if output is None:
-        raise ValueError("Model returned an empty response")
-    return TweetSentimentList.model_validate_json(output)
+model = init_chat_model(
+    settings.claude_model,
+    api_key=settings.anthropic_api_key,
+    timeout=600,
+    max_tokens=4000,
+    streaming=True,
+    output_config={"effort": "low"},
+)
 
-
-def main(no_of_tweets: int = 3, skip: int = 0) -> int:
-    """
-    Read tweets from the database and run sentiment analysis.
-
-    Returns no of tweets read from the database
-    """
-    tweets = twitter_service.get_tweets_minimal(
-        tweet_lang="en", limit=no_of_tweets, skip=skip, has_sentiment=False
-    )
-    if len(tweets) == 0:
-        print("No tweets to process")
-        return 0
-    analyzed_tweets = analyze_tweets(tweets, sentiment_data=SENTIMENT_DICT)
-    print(f"Analyzed_Tweets: {len(analyzed_tweets.tweets)}")
-    twitter_service.bulk_update_tweet_sentiment(analyzed_tweets)
-    print("Done")
-    return len(tweets)
+sentiment_agent = create_agent(
+    model=model,
+    system_prompt=SYSTEM_PROMPT,
+    response_format=TweetSentimentList,
+)

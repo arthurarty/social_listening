@@ -1,8 +1,8 @@
 import time
 
-from app.agents.topic_agent import main
+from app.agent_workflows.topic_modeling import main
 
-SLEEP_TIMER = 5
+SLEEP_TIMER = 2
 TOTAL_BATCHES = 10
 
 for i in range(TOTAL_BATCHES):

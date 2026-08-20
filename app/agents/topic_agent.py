@@ -6,7 +6,6 @@ from contextlib import contextmanager
 from typing import Any, Dict, List
 
 from langchain.agents import create_agent
-from langchain.chat_models import init_chat_model
 
 from app.database.connection import get_session
 from app.logger import logger
@@ -35,15 +34,14 @@ Your task:
 """
 
 
-ollama_gemma4 = init_chat_model(
-    "ollama:gemma4",
-    temperature=0,
-    timeout=900,
-    max_tokens=4096,
-)
+# ollama_gemma4 = init_chat_model(
+#     "ollama:gemma4",
+#     temperature=0,
+#     timeout=300,
+# )
 
 agent = create_agent(
-    model=ollama_gemma4,
+    model="ollama:gemma4",
     system_prompt=SYSTEM_PROMPT,
     response_format=CategorizedTweetsOutput,
 )
@@ -66,7 +64,8 @@ def assign_topics(
             ]
         }
     )
-    return result["structured_response"]
+    output = result["structured_response"]
+    return output
 
 
 def main(no_of_tweets: int = 3, skip: int = 0) -> int:
@@ -88,7 +87,7 @@ def main(no_of_tweets: int = 3, skip: int = 0) -> int:
         return 0
     logger.info("Assigning topics")
     categorized_tweets = assign_topics(tweets, topics_data)
-    print(f"Categorized_Tweets: {len(categorized_tweets.categorized_tweets)}")
+    logger.info("Categorized_Tweets: %s", len(categorized_tweets.categorized_tweets))
     logger.info("Persisting changes to db.")
     twitter_service.bulk_update_tweet_topic(categorized_tweets)
     return len(tweets)

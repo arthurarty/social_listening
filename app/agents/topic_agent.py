@@ -9,6 +9,7 @@ from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
 
 from app.database.connection import get_session
+from app.logger import logger
 from app.schemas.topic_schema import CategorizedTweetsOutput, TopicRead
 from app.schemas.twitter_schema import TweetMinimal
 from app.services.instances import topic_service, twitter_service
@@ -37,7 +38,7 @@ Your task:
 ollama_gemma4 = init_chat_model(
     "ollama:gemma4",
     temperature=0,
-    timeout=300,
+    timeout=900,
     max_tokens=4096,
 )
 
@@ -76,15 +77,18 @@ def main(no_of_tweets: int = 3, skip: int = 0) -> int:
     Returns no of tweets read from the database
     """
     with contextmanager(get_session)() as session:
+        logger.info("Pulling Topics")
         topics = topic_service.get_topics(session)
         topics_data = [TopicRead.model_validate(topic).model_dump() for topic in topics]
+    logger.info("Pulling tweets")
     tweets = twitter_service.get_tweets_minimal(
         tweet_lang="en", limit=no_of_tweets, skip=skip, is_categorized=False
     )
     if len(tweets) == 0:
         return 0
+    logger.info("Assigning topics")
     categorized_tweets = assign_topics(tweets, topics_data)
     print(f"Categorized_Tweets: {len(categorized_tweets.categorized_tweets)}")
+    logger.info("Persisting changes to db.")
     twitter_service.bulk_update_tweet_topic(categorized_tweets)
-    print("Done")
     return len(tweets)

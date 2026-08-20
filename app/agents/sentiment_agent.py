@@ -2,6 +2,7 @@ from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
 
 from app.config import settings
+from app.schemas.twitter_schema import TweetSentimentList
 
 SYSTEM_PROMPT = """You are a sentiment classifier for airline-related tweets.
 
@@ -82,15 +83,16 @@ SENTIMENT_DICT = {
 
 
 model = init_chat_model(
-    "claude-sonnet-4-6",
+    settings.claude_model,
     api_key=settings.anthropic_api_key,
-    temperature=0,
     timeout=600,
     max_tokens=4000,
     streaming=True,
+    output_config={"effort": "low"},
 )
 
 sentiment_agent = create_agent(
     model=model,
     system_prompt=SYSTEM_PROMPT,
+    response_format=TweetSentimentList,
 )

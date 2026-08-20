@@ -3,7 +3,7 @@ import time
 from app.agent_workflows.sentiment import main
 
 SLEEP_TIMER = 2
-TOTAL_BATCHES = 2
+TOTAL_BATCHES = 10
 
 
 for i in range(TOTAL_BATCHES):

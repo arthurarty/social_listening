@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     file_upload_dir: str = "local_files/uploads"
     database_url: str
     tweet_api_io: str
+    anthropic_api_key: str
     log_level: int = logging.INFO
     model_config = SettingsConfigDict(env_file=".env")
 

@@ -1,6 +1,6 @@
 import time
 
-from app.llms.categorize_tweet import main
+from app.agents.topic_agent import main
 
 SLEEP_TIMER = 5
 TOTAL_BATCHES = 10

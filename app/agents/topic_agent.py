@@ -34,12 +34,6 @@ Your task:
 """
 
 
-# ollama_gemma4 = init_chat_model(
-#     "ollama:gemma4",
-#     temperature=0,
-#     timeout=300,
-# )
-
 agent = create_agent(
     model="ollama:gemma4",
     system_prompt=SYSTEM_PROMPT,

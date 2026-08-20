@@ -1,9 +1,9 @@
 import time
 
-from app.agents.topic_agent import main
+from app.agent_workflows.topic_modeling import main
 
-SLEEP_TIMER = 5
-TOTAL_BATCHES = 10
+SLEEP_TIMER = 2
+TOTAL_BATCHES = 3
 
 for i in range(TOTAL_BATCHES):
     print(f"Handling bunch {i+1} of {TOTAL_BATCHES}")

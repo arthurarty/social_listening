@@ -147,17 +147,25 @@ class TwitterServiceImpl(TwitterServiceInterface):
 
     def store_tweets(self, tweets: List[Tweet]) -> str:
         """
-        Persists the tweets to the database in a single bulk insert.
-        Tweets whose tweet_id already exists are skipped.
+        Persists the tweets to the database in a single bulk upsert.
+        Tweets whose tweet_id already exists have their engagement
+        metrics (retweet_count, reply_count, like_count, quote_count,
+        view_count) refreshed; all other columns are left untouched.
         """
         if not tweets:
             return "Done"
 
         values = [tweet.model_dump(exclude={"id"}) for tweet in tweets]
-        stmt = (
-            pg_insert(Tweet)
-            .values(values)
-            .on_conflict_do_nothing(index_elements=["tweet_id"])
+        insert_stmt = pg_insert(Tweet).values(values)
+        stmt = insert_stmt.on_conflict_do_update(
+            index_elements=["tweet_id"],
+            set_={
+                "retweet_count": insert_stmt.excluded.retweet_count,
+                "reply_count": insert_stmt.excluded.reply_count,
+                "like_count": insert_stmt.excluded.like_count,
+                "quote_count": insert_stmt.excluded.quote_count,
+                "view_count": insert_stmt.excluded.view_count,
+            },
         )
         with db_session() as session:
             session.execute(stmt)
